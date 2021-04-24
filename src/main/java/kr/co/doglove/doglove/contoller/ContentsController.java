@@ -6,6 +6,8 @@ import kr.co.doglove.doglove.service.ContentsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/contents")
 @RequiredArgsConstructor
@@ -23,4 +25,21 @@ public class ContentsController {
         Long id = contentsService.save(contents);
         return id;
     }
+
+    @PutMapping("/v1/update/{id}")
+    public void updateContents(@PathVariable("id") Long id, @RequestBody Contents contents){
+        contentsService.update(id, contents);
+    }
+
+    @DeleteMapping("/v1/delete/{id}")
+    public void deleteContents(@PathVariable("id") Long id){
+        contentsService.delete(id);
+    }
+
+    @GetMapping("/v1/list/{name}")
+    public List<Contents> findName(@PathVariable("name") String name){
+        return contentsService.findByName(name);
+    }
+
+
 }
