@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,16 @@ public class Member {
     private LocalDateTime regDate;
     private LocalDateTime loginDate;
     private Address address;
+
+    public Member() {
+
+    }
+
+    public Member(String email) {
+        this.email = email;
+        this.regDate = LocalDateTime.now();
+        this.loginDate = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberDog> memberDogs = new ArrayList<>();
