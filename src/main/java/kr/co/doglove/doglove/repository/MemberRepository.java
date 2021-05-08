@@ -23,11 +23,11 @@ public class MemberRepository {
     }
 
     public List<Member> findAll() {
-        return (List<Member>) em.createQuery("SELECT m FROM Member m").getResultList();
+        return em.createQuery("SELECT m FROM Member m", Member.class).getResultList();
     }
 
     public Member findByEmail(String email) {
-        return (Member) em.createQuery("SELECT m FROM Member m WHERE m.email = :email")
+        return em.createQuery("SELECT m FROM Member m WHERE m.email = :email", Member.class)
                 .setParameter("email", email)
                 .getSingleResult();
     }
