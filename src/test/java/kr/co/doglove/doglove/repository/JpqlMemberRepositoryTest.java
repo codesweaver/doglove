@@ -1,32 +1,22 @@
 package kr.co.doglove.doglove.repository;
 
-import kr.co.doglove.doglove.domain.Address;
-import kr.co.doglove.doglove.domain.Dog;
 import kr.co.doglove.doglove.domain.Member;
-import kr.co.doglove.doglove.domain.MemberDog;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MemberRepositoryTest {
+class JpqlMemberRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    JpqlMemberRepository jpqlMemberRepository;
 
     @BeforeEach
     public void beforeEach() {
@@ -37,10 +27,10 @@ class MemberRepositoryTest {
     void save() {
         //given
         Member member = new Member("codetrain999@gmail.com");
-        Long memberId = memberRepository.save(member);
+        Long memberId = jpqlMemberRepository.save(member);
 
         //when
-        Member foundMember = memberRepository.findOne(memberId);
+        Member foundMember = jpqlMemberRepository.findOne(memberId);
 
         //then
         Assertions.assertThat(foundMember).isEqualTo(member);
@@ -52,11 +42,11 @@ class MemberRepositoryTest {
         Member member1 = new Member("codetrain999@gmail.com");
         Member member2 = new Member("namakemonobistro@gmail.com");
 
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        jpqlMemberRepository.save(member1);
+        jpqlMemberRepository.save(member2);
 
         //when
-        List<Member> members = memberRepository.findAll();
+        List<Member> members = jpqlMemberRepository.findAll();
 
         //then
         Assertions.assertThat(members.size()).isEqualTo(2);
@@ -69,11 +59,11 @@ class MemberRepositoryTest {
         Member member1 = new Member("codetrain999@gmail.com");
         Member member2 = new Member("namakemonobistro@gmail.com");
 
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        jpqlMemberRepository.save(member1);
+        jpqlMemberRepository.save(member2);
 
         //when
-        Member foundMember = memberRepository.findByEmail("codetrain999@gmail.com");
+        Member foundMember = jpqlMemberRepository.findByEmail("codetrain999@gmail.com");
 
         //then
         Assertions.assertThat(foundMember).isEqualTo(member1);

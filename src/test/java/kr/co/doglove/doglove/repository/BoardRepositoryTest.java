@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional(readOnly = true)
 class BoardRepositoryTest {
@@ -21,7 +19,7 @@ class BoardRepositoryTest {
     DogRepository dogRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    JpqlMemberRepository jpqlMemberRepository;
 
     @Test
     void 보드생성테스트() {
@@ -44,7 +42,7 @@ class BoardRepositoryTest {
         memberDog.setSex("Male");
 
         member.createMemberDog(memberDog);
-        memberRepository.save(member);
+        jpqlMemberRepository.save(member);
 
         Board board = new Board();
         board.setSubject("테스트 서브젝트");

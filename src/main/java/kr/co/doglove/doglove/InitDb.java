@@ -1,11 +1,9 @@
 package kr.co.doglove.doglove;
 
-import kr.co.doglove.doglove.domain.Address;
-import kr.co.doglove.doglove.domain.Goods;
-import kr.co.doglove.doglove.domain.Order;
-import kr.co.doglove.doglove.domain.OrderItem;
-import kr.co.doglove.doglove.repository.GoodsRepository;
-import kr.co.doglove.doglove.repository.OrderRepository;
+import kr.co.doglove.doglove.domain.*;
+import kr.co.doglove.doglove.repository.JpqlGoodsRepository;
+import kr.co.doglove.doglove.repository.JpqlOrderRepository;
+import kr.co.doglove.doglove.repository.JpqlUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +22,7 @@ public class InitDb {
     @PostConstruct
     public void init(){
         initService.dbInit1();
+        initService.dbInit2();
     }
 
     @Component
@@ -31,8 +30,9 @@ public class InitDb {
     @Transactional
     static class InitService{
         private final EntityManager em;
-        private final GoodsRepository goodsRepository;
-        private final OrderRepository orderRepository;
+        private final JpqlGoodsRepository goodsRepository;
+        private final JpqlOrderRepository orderRepository;
+        private final JpqlUserRepository userRepository;
 
         public void dbInit1(){
             Random random = new Random();
@@ -119,6 +119,50 @@ public class InitDb {
                 order4.addOrderItem(build);
             }
             orderRepository.save(order4);
+        }
+
+        public void dbInit2(){
+            User User1 = new User("김용수",44);
+            User User2 = new User("홍성현",36);
+            User User3 = new User("이상영",35);
+            User User4 = new User("박성훈",34);
+            User User5 = new User("송규상",40);
+            User User6 = new User("홍진주",40);
+            User User7 = new User("김현정",43);
+            User User8 = new User("함희연",43);
+            User User9 = new User("김은혜",36);
+            User User10 = new User("문소연",37);
+            User User11 = new User("장준석",43);
+            User User12 = new User("제니",25);
+            User User13 = new User("제시",33);
+            User User14 = new User("아이유",29);
+            User User15 = new User("김유정",29);
+
+
+            saveUsers(
+                    User1,
+                    User2,
+                    User3,
+                    User4,
+                    User5,
+                    User6,
+                    User7,
+                    User8,
+                    User9,
+                    User10,
+                    User11,
+                    User12,
+                    User13,
+                    User14,
+                    User15
+            );
+
+        }
+
+        private void saveUsers(User... users){
+            for (User user : users) {
+                userRepository.save(user);
+            }
         }
     }
 }

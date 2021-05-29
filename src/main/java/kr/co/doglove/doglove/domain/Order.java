@@ -11,6 +11,10 @@ import java.util.List;
 @Entity
 @Getter @Setter
 @Table(name = "Orders")
+//@NamedQuery (
+//        name = "Order.findOne",
+//        query = "select o from Order o where o.id=:id"
+//)
 public class Order {
 
     @Id

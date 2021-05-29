@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepository {
+public class JpqlMemberRepository {
 
     private final EntityManager em;
 
