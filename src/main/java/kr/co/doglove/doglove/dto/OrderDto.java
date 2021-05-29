@@ -25,8 +25,8 @@ public class OrderDto {
 
     @Builder
     public OrderDto(String orderName, String recvName, String street, String city, String zipcode) {
-        Assert.hasText(orderName, "주문자명은 필수 입니다");
-        Assert.hasText(recvName, "수령인명은 필수 입니다");
+//        Assert.hasText(orderName, "주문자명은 필수 입니다");
+//        Assert.hasText(recvName, "수령인명은 필수 입니다");
         this.orderName = orderName;
         this.recvName = recvName;
         this.street = street;

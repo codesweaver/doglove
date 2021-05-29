@@ -20,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional(readOnly = true)
-class OrderRepositoryTest {
+class JpqlOrderRepositoryTest {
     @Autowired
-    private OrderRepository orderRepository;
+    //private JpqlOrderRepository jpqlOrderRepository;;
+    private JpaOrderRepository orderRepository;;
 
     @Autowired
-    private GoodsRepository goodsRepository;
+    private JpqlGoodsRepository jpqlGoodsRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -34,11 +35,11 @@ class OrderRepositoryTest {
     void 기본데이터입력() {
         Goods goods1 = new Goods();
         goods1.setName("Java의 정석 vol.1");
-        goodsRepository.save(goods1);
+        jpqlGoodsRepository.save(goods1);
 
         Goods goods2 = new Goods();
         goods2.setName("자바의 정석 vol.2");
-        goodsRepository.save(goods2);
+        jpqlGoodsRepository.save(goods2);
 
         Order order = new Order();
         order.setOrderName("홍성현");
@@ -68,7 +69,7 @@ class OrderRepositoryTest {
         List<Order> orders = orderRepository.findAll();
         Order order = orders.get(0);
 
-        Order foundOrder = orderRepository.findOne(order.getId());
+        Order foundOrder = orderRepository.findById(order.getId()).orElse(null);
 
         assertAll("주문 등록 테스트",
                 () -> assertEquals(order, foundOrder),
@@ -91,7 +92,7 @@ class OrderRepositoryTest {
 
         em.flush();
 
-        Order foundOrder = orderRepository.findOne(order.getId());
+        Order foundOrder = orderRepository.findById(order.getId()).orElse(null);
         assertEquals(foundOrder.getOrderItems().size(), order.getOrderItems().size());
     }
 
@@ -104,7 +105,7 @@ class OrderRepositoryTest {
 
         Goods addGoods = new Goods();
         addGoods.setName("토비의 스프링");
-        goodsRepository.save(addGoods);
+        jpqlGoodsRepository.save(addGoods);
 
         OrderItem addOrderItem = new OrderItem();
         addOrderItem.setGoods(addGoods);
@@ -115,7 +116,7 @@ class OrderRepositoryTest {
 
         em.flush();
 
-        Order foundOrder = orderRepository.findOne(order.getId());
+        Order foundOrder = orderRepository.findById(order.getId()).orElse(null);
 
         assertEquals(foundOrder.getOrderItems().size(), currentCount+1);
     }
@@ -134,7 +135,7 @@ class OrderRepositoryTest {
 
         em.flush();
 
-        Order foundOrder = orderRepository.findOne(order.getId());
+        Order foundOrder = orderRepository.findById(order.getId()).orElse(null);
         assertEquals(foundOrder.getOrderItems().get(0).getQuantity(), curremntQuantity+1);
     }
 }
