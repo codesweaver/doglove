@@ -20,7 +20,7 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        default_batch_size: 1000
+#        default_batch_size: 1000
         show_sql: false
         format_sql: true
 
