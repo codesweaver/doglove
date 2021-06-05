@@ -6,8 +6,8 @@ import javax.persistence.*;
 
 @Entity
 @Getter @Setter
-@ToString
 @NoArgsConstructor
+@ToString(of = {"id", "quantity", "unitPrice", "goods"})
 public class OrderItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

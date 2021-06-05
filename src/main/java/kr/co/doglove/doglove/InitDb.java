@@ -122,21 +122,27 @@ public class InitDb {
         }
 
         public void dbInit2(){
-            User User1 = new User("김용수",44);
-            User User2 = new User("홍성현",36);
-            User User3 = new User("이상영",35);
-            User User4 = new User("박성훈",34);
-            User User5 = new User("송규상",40);
-            User User6 = new User("홍진주",40);
-            User User7 = new User("김현정",43);
-            User User8 = new User("함희연",43);
-            User User9 = new User("김은혜",36);
-            User User10 = new User("문소연",37);
-            User User11 = new User("장준석",43);
-            User User12 = new User("제니",25);
-            User User13 = new User("제시",33);
-            User User14 = new User("아이유",29);
-            User User15 = new User("김유정",29);
+
+            Company company1 = new Company("청오");
+            Company company2 = new Company("코리아센터");
+            em.persist(company1);
+            em.persist(company2);
+
+            User User1 = new User("김용수",44, "남");
+            User User2 = new User("홍성현",36, "남");
+            User User3 = new User("이상영",35, "여");
+            User User4 = new User("박성훈",34, "여");
+            User User5 = new User("송규상",40, "남");
+            User User6 = new User("홍진주",40, "여");
+            User User7 = new User("김현정",43, "여");
+            User User8 = new User("함희연",43, "여");
+            User User9 = new User("김은혜",36, "여");
+            User User10 = new User("문소연",37, "여");
+            User User11 = new User("장준석",43, "남");
+            User User12 = new User("제니",25, "여");
+            User User13 = new User("제시",33, "여");
+            User User14 = new User("아이유",29, "여");
+            User User15 = new User("김유정",29, "여");
 
 
             saveUsers(
@@ -156,6 +162,22 @@ public class InitDb {
                     User14,
                     User15
             );
+
+            company1.addUser(User1);
+            company1.addUser(User2);
+            company1.addUser(User3);
+            company1.addUser(User4);
+            company1.addUser(User5);
+            company1.addUser(User6);
+            company1.addUser(User7);
+            company2.addUser(User8);
+            company2.addUser(User9);
+            company2.addUser(User10);
+            company2.addUser(User11);
+            company2.addUser(User12);
+            company2.addUser(User13);
+            company2.addUser(User14);
+            company2.addUser(User15);
 
         }
 

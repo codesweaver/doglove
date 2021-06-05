@@ -3,6 +3,7 @@ package kr.co.doglove.doglove.domain;
 import kr.co.doglove.doglove.domain.Address;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 //        name = "Order.findOne",
 //        query = "select o from Order o where o.id=:id"
 //)
+@ToString(of = {"id", "orderName", "recvName"})
 public class Order {
 
     @Id
