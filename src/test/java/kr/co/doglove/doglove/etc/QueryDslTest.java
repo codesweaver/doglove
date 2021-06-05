@@ -2,6 +2,7 @@ package kr.co.doglove.doglove.etc;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.doglove.doglove.domain.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -222,10 +223,50 @@ public class QueryDslTest {
         }
     }
 
-//    @Test
-//    void left_join_member_company() {
-//        queryFactory
-//                .select(user, company)
-//                .join()
-//    }
+    @Test
+    void WHERE_서브쿼리() {
+        QUser userSub = new QUser("userSub");
+
+        List<User> results = queryFactory
+                .selectFrom(user)
+                .where(user.age.eq(
+                        JPAExpressions
+                                .select(userSub.age.min())
+                                .from(userSub)
+                ))
+                .fetch();
+        for(User user : results) {
+            System.out.println(user.toString());
+        }
+    }
+
+    @Test
+    void SELECT_서브쿼리() {
+        QUser userSub = new QUser("userSub");
+
+        List<Tuple> results = queryFactory
+                .select(user, JPAExpressions
+                        .select(userSub.age.avg())
+                        .from(userSub))
+                .from(user)
+                .fetch();
+        for (Tuple result : results) {
+            System.out.println(result.get(user).toString());
+        }
+    }
+
+    @Test
+    void CASE() {
+        List<String> results = queryFactory
+                .select(user.age
+                        .when(44).then("용수나이")
+                        .when(36).then("상영나이")
+                        .otherwise("어린것들")
+                )
+                .from(user)
+                .fetch();
+        for(String result: results) {
+            System.out.println(result);
+        }
+    }
 }
