@@ -1,18 +1,28 @@
 package kr.co.doglove.doglove.etc;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.QueryFactory;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.*;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.doglove.doglove.domain.*;
+import kr.co.doglove.doglove.dto.MemberDto;
+import kr.co.doglove.doglove.dto.QMemberDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static kr.co.doglove.doglove.domain.QGoods.goods;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -222,10 +232,297 @@ public class QueryDslTest {
         }
     }
 
-//    @Test
-//    void left_join_member_company() {
-//        queryFactory
-//                .select(user, company)
-//                .join()
-//    }
+    @Test
+    void WHERE_서브쿼리() {
+        QUser userSub = new QUser("userSub");
+
+        List<User> results = queryFactory
+                .selectFrom(user)
+                .where(user.age.eq(
+                        JPAExpressions
+                                .select(userSub.age.min())
+                                .from(userSub)
+                ))
+                .fetch();
+        for(User user : results) {
+            System.out.println(user.toString());
+        }
+    }
+
+    @Test
+    void SELECT_서브쿼리() {
+        QUser userSub = new QUser("userSub");
+
+        List<Tuple> results = queryFactory
+                .select(user, JPAExpressions
+                        .select(userSub.age.avg())
+                        .from(userSub))
+                .from(user)
+                .fetch();
+        for (Tuple result : results) {
+            System.out.println(result.get(user).toString());
+        }
+    }
+
+    @Test
+    void CASE() {
+        List<String> results = queryFactory
+                .select(user.age
+                        .when(44).then("용수나이")
+                        .when(36).then("상영나이")
+                        .otherwise("어린것들")
+                )
+                .from(user)
+                .fetch();
+        for(String result: results) {
+            System.out.println(result);
+        }
+    }
+
+    @Test
+    void CASE_WHEN_TEST() {
+
+        NumberExpression<Integer> rankPath = new CaseBuilder()
+                .when(user.age.between(20, 30)).then(3)
+                .when(user.age.between(31, 40)).then(1)
+                .when(user.age.between(41, 50)).then(2)
+                .otherwise(9);
+
+        StringExpression rankString = new CaseBuilder()
+                .when(user.age.between(20, 30)).then("좋을때다")
+                .when(user.age.between(31, 40)).then("건강관리하자")
+                .when(user.age.between(41, 50)).then("이젠 조심해야지")
+                .otherwise("사망");
+
+        List<Tuple> resultList = queryFactory
+                .select(user.name, user.age, rankString)
+                .from(user)
+                .orderBy(rankPath.asc())
+                .fetch();
+
+        for (Tuple result : resultList){
+            System.out.printf("이름: %s, 나이:%d, 상태: %s\n",
+                    result.get(user.name),
+                    result.get(user.age),
+                    result.get(rankString));
+        }
+    }
+
+    @Test
+    void 상수표현() {
+        List<Tuple> resultList = queryFactory
+                .select(user.name, user.age, Expressions.constant("A"))
+                .from(user)
+                .fetch();
+        for (Tuple result : resultList) {
+            System.out.printf("result = %s\n", result);
+        }
+    }
+
+    @Test
+    void 콘캣테스트() {
+        List<Tuple> resultList = queryFactory
+                .select(user.name, user.age, user.name.concat("_").concat(user.age.stringValue()))
+                .from(user)
+                .fetch();
+        for (Tuple result : resultList) {
+            System.out.printf("result = %s\n", result);
+        }
+    }
+
+    @Test
+    void 단일갑프로젝션() {
+        List<String> fetch = queryFactory
+                .select(user.name)
+                .from(user)
+                .offset(0).limit(5)
+                .fetch();
+        for (String s : fetch) {
+            System.out.printf("s = %s\n", s);
+        }
+    }
+
+    @Test
+    void 복수값프로젝션() {
+        List<Tuple> fetch = queryFactory
+                .select(user.name, user.age)
+                .from(user)
+                .offset(0).limit(5)
+                .fetch();
+        for (Tuple tuple : fetch) {
+            String s = tuple.get(user.name);
+            Integer i = tuple.get(user.age);
+            System.out.printf("name = %s, age = %d\n", s, i);
+        }
+    }
+
+    @Test
+    void 프로젝션DTO_빈으로_사용하기() {
+        List<MemberDto> fetch = queryFactory
+                .select(Projections.bean(MemberDto.class,
+                        user.name,
+                        user.age,
+                        user.sex
+                ))
+                .from(user)
+                .offset(0).limit(5)
+                .fetch();
+        // memberDto.setName(name);
+        for (MemberDto memberDto : fetch) {
+            System.out.println(memberDto);
+        }
+    }
+
+    @Test
+    void 프로젝션DTO_필드직접적근_사용하기() {
+        List<MemberDto> fetch = queryFactory
+                .select(Projections.fields(MemberDto.class,
+                        user.name,
+                        user.age,
+                        user.sex
+                ))
+                .from(user)
+                .offset(0).limit(5)
+                .fetch();
+        // memberDto.name = name;
+        for (MemberDto memberDto : fetch) {
+            System.out.println(memberDto);
+        }
+    }
+
+    @Test
+    void 프로젝션DTO_이름이다를경우_사용하기() {
+        List<MemberDto> fetch = queryFactory
+                .select(Projections.fields(MemberDto.class,
+                        user.name.as("name"),
+                        user.age,
+                        user.sex
+                ))
+                .from(user)
+                .offset(0).limit(5)
+                .fetch();
+        for (MemberDto memberDto : fetch) {
+            System.out.println(memberDto);
+        }
+    }
+
+    @Test
+    void 프로젝션DTO_생성자_사용하기() {
+        // 파라미터의 순서만 일치한다면 필드 이름이 다른 문제는 무시한다
+        List<MemberDto> fetch = queryFactory
+                .select(Projections.constructor(MemberDto.class,
+                        user.name,
+                        user.age,
+                        user.sex
+                ))
+                .from(user)
+                .offset(0).limit(5)
+                .fetch();
+        for (MemberDto memberDto : fetch) {
+            System.out.println(memberDto);
+        }
+    }
+
+    @Test
+    void 프로젝션DTO_QClass_사용하기() {
+        // 파라미터의 순서만 일치한다면 필드 이름이 다른 문제는 무시한다
+        List<MemberDto> fetch = queryFactory
+            .select(new QMemberDto(user.name, user.age, user.sex))
+            .from(user)
+            .offset(0).limit(5)
+            .fetch();
+        for (MemberDto memberDto : fetch) {
+            System.out.println(memberDto);
+        }
+    }
+
+    @Test
+    void distinct_사용하기() {
+        List<String> fetch = queryFactory
+                .select(user.sex).distinct()
+                .from(user)
+                .fetch();
+        for (String s : fetch) {
+            System.out.printf("s = %s\n", s);
+        }
+    }
+
+    @Test
+    void 동적쿼리_불린빌더() {
+        Map<String, Object> params = Map.of(
+//                "age", 44,
+//                "name", "김용수",
+                "sex", "남"
+        );
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        if (params.containsKey("age")) {
+            booleanBuilder.and(user.age.eq(Integer.parseInt(params.get("age").toString())));
+        }
+        if (params.containsKey("name")) {
+            booleanBuilder.and(user.name.eq(params.get("name").toString()));
+        }
+        if (params.containsKey("sex")) {
+            booleanBuilder.and(user.sex.eq(params.get("sex").toString()));
+        }
+
+        List<User> fetch = queryFactory
+                .selectFrom(user)
+                .where(booleanBuilder)
+                .fetch();
+        for (User fetch1 : fetch) {
+            System.out.println(fetch1);
+        }
+    }
+
+    @Test
+    void 동적쿼리_불린익스프레션() {
+//        String name = "김용수";
+        String name = null;
+        String sex = "남";
+//        Integer age = 44;
+        Integer age = null;
+
+        List<User> fetch = queryFactory
+                .selectFrom(user)
+                .where(nameEq(name), sexEq(sex), ageEq(age))
+                .fetch();
+        for (User fetch1 : fetch) {
+            System.out.println(fetch1);
+        }
+    }
+
+    private BooleanExpression nameEq(String name) {
+        return name == null ? null : user.name.eq(name);
+    }
+
+    private BooleanExpression sexEq(String sex) {
+        return sex == null ? null : user.sex.eq(sex);
+    }
+
+    private BooleanExpression ageEq(Integer age) {
+        return age == null ? null : user.age.eq(age);
+    }
+
+    @Test
+    void 대량_업데이트() {
+        Long count = queryFactory
+                .update(user)
+                .set(user.sex, "여")
+                .set(user.age, user.age.add(2))
+                .execute();
+        System.out.println(count);
+
+        em.flush();
+        em.clear();
+
+        List<User> userList = queryFactory
+                .selectFrom(user)
+                .where(user.sex.eq("여"))
+                .fetch();
+
+        for (User user : userList) {
+            System.out.println(user);
+        }
+    }
 }
