@@ -29,3 +29,10 @@ logging:
 #    root: warn
     org.hibernate.SQL: debug
     org.hibernate.type: trace
+    kr.co.doglove.doglove.mapper: trace;
+
+mybatis:
+  mapper-locations: mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: kr.co.doglove.doglove.domain

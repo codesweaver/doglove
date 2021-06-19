@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.doglove.doglove.mapper.UserMapper">
+    <resultMap id="getUserEntityMap" type="User">
+        <id column="member_id" property="id" />
+        <result column="name" property="name" />
+        <result column="age" property="age" />
+        <result column="sex" property="sex" />
+        <association property="company" javaType="Company">
+            <id column="company_id" property="id" />
+            <result column="companyName" property="name"/>
+        </association>
+    </resultMap>
+
+    <select id="findByBatis" resultMap="getUserEntityMap">
+        select
+            m.user_id, m.name, m.age, m.sex,
+            c.company_id, c.name as companyName
+        from
+             user m
+            inner join company c on m.company_id = c.company_id
+        where 1=1
+        <if test="name != null and name != ''">
+            and m.name = #{name}
+        </if>
+        <if test="age != null and age != ''">
+            and m.age = #{age}
+        </if>
+        <if test="sex != null and sex !=''">
+            and m.sex = #{sex}
+        </if>
+    </select>
+</mapper>
